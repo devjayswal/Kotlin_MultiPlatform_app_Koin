@@ -1,0 +1,74 @@
+# Built artifacts
+**/build/
+*.apk
+*.aar
+*.ap_
+*.dex
+bin/
+
+# IDE - IntelliJ IDEA / Android Studio
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+cmake-build-*/
+.navigation/
+
+# Gradle
+.gradle/
+local.properties
+.bundle/
+vendor/bundle/
+.temp/
+
+# Kotlin
+.kotlin/
+kotlin-js-store/
+
+# iOS / Xcode
+**/iosApp/build/
+**/iosApp.xcworkspace/
+**/iosApp.xcodeproj/project.xcworkspace/
+**/iosApp.xcodeproj/xcuserdata/
+**/iosApp.xcodeproj/xcshareddata/
+!**/iosApp.xcodeproj/project.pbxproj
+!**/iosApp.xcodeproj/xcshareddata/
+!**/iosApp.xcworkspace/contents.xcworkspacedata
+**/xcshareddata/WorkspaceSettings.xcsettings
+.apple_dist/
+*.moved-aside
+*.xcuserstate
+DerivedData/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Windows
+Thumbs.db
+desktop.ini
+ehthumbs.db
+DiskInventory.gid
+
+# Android Studio / Android
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Crashlytics
+com_crashlytics_export_strings.xml
+
+# Secrets & Local Config
+secrets.properties
+google-services.json
+GoogleService-Info.plist
+
+# Node / JS (if applicable)
+node_modules/
+npm-debug.log
+yarn-error.log
+.eslintcache
