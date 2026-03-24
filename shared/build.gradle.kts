@@ -51,8 +51,9 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.compose.uiToolingPreview)
-            implementation(libs.koin.compose.viewmodel)
             implementation(libs.ktor.client.okhttp)
+            api(libs.androidx.navigation.compose)
+            api(libs.koin.compose.viewmodel)
 
         }
         iosMain.dependencies {

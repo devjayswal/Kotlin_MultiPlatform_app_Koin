@@ -13,9 +13,14 @@ struct ContentView: View {
 
                 VStack(spacing: 16) {
                     Image(systemName: "swift")
-                        .font(.system(size: 200))
+                        .font(.system(size: 80)) // Reduced size
                         .foregroundColor(.accentColor)
-                    Text("SwiftUI: \(viewModel.uiState)")
+
+                    Text("SwiftUI iOS App")
+                        .font(.largeTitle)
+
+                    // Use the TimerView which consumes the SharedTestViewModel
+                    TimerView(viewModel: viewModel)
                 }
                 .transition(.move(edge: .top).combined(with: .opacity))
 
@@ -30,3 +35,4 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+

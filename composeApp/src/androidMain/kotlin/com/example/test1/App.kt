@@ -9,7 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.test1.ui.Timer
+import com.example.test1.ui.MainScreen
 import org.koin.compose.KoinContext
 
 @Composable
@@ -24,8 +24,9 @@ fun App() {
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Timer(modifier = Modifier.fillMaxSize())
+                MainScreen()
             }
         }
     }
+
 }
