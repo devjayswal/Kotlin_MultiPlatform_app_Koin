@@ -7,11 +7,11 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 actual fun viewModelModule(): Module {
-    return module {factory { SharedTestViewModel() }}
+    return module {
+        factory { SharedTestViewModel(get()) }
+    }
 }
 
 class ViewModelProvider : KoinComponent {
-
     fun provideSharedTestViewModel() = get<SharedTestViewModel>()
-
 }

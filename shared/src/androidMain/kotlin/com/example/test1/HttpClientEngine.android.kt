@@ -1,0 +1,7 @@
+package com.example.test1
+
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.okhttp.OkHttp
+
+internal actual fun createHttpClientEngine(): HttpClientEngine = OkHttp.create()
+

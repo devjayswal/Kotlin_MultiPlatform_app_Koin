@@ -34,10 +34,10 @@ class MainActivity : ComponentActivity() {
     private fun muteNotifications() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (notificationManager.isNotificationPolicyAccessGranted) {
-            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE)
+//            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE)
         } else {
-            val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
-            startActivity(intent)
+//            val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+//            startActivity(intent)
         }
     }
 

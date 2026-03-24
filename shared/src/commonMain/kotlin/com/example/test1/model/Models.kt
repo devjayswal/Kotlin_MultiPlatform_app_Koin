@@ -1,0 +1,59 @@
+package com.example.test1.model
+
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
+
+// News Models
+@Serializable
+data class NewsResponse(
+    val count: Int,
+    val next: String? = null,
+    val previous: String? = null,
+    val results: List<NewsItem>
+)
+
+@Serializable
+data class NewsItem(
+    val id: Int,
+    val title: String,
+    val summary: String? = null,
+    @SerialName("image_url")
+    val imageUrl: String? = null,
+    @SerialName("published_at")
+    val publishedAt: String,
+    @SerialName("news_site")
+    val newsSite: String? = null,
+    val url: String? = null,
+    val authors: List<Author> = emptyList(),
+    @SerialName("updated_at")
+    val updatedAt: String? = null
+)
+
+@Serializable
+data class Author(
+    val name: String,
+    val socials: Socials? = null
+)
+
+@Serializable
+data class Socials(
+    val x: String? = null,
+    val youtube: String? = null,
+    val instagram: String? = null,
+    val linkedin: String? = null,
+    val mastodon: String? = null,
+    val bluesky: String? = null
+)
+
+// User Models
+@Serializable
+data class NetworkUser(
+    val id: Int,
+    val firstName: String,
+    val lastName: String,
+    val email: String,
+    val city: String,
+    val gender: String,
+    val language: String,
+    val address: String
+)

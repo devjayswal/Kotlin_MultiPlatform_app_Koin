@@ -7,6 +7,6 @@ import org.koin.dsl.module
 
 actual fun viewModelModule(): Module {
     return module {
-        viewModel { SharedTestViewModel() }
+        viewModel { SharedTestViewModel(get()) }
     }
 }

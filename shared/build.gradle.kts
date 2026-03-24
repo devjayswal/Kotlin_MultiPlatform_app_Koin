@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinx.serialization)
     // alias(libs.plugins.ksp)
     // alias(libs.plugins.native.coroutines)
     alias(libs.plugins.composeCompiler)
@@ -37,6 +38,12 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.kmp.observableviewmodel.core)
             implementation(libs.androidx.lifecycle.viewmodel)
+            implementation(libs.kotlinx.serialization.json) // for json serialization and deserialization
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -45,6 +52,11 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.koin.compose.viewmodel)
+            implementation(libs.ktor.client.okhttp)
+
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
     }
 }
