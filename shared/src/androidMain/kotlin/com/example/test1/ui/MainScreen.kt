@@ -4,6 +4,7 @@ import android.R.attr.name
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
@@ -16,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -25,11 +27,18 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.test1.model.User
 import com.example.test1.ui.viewModels.ViewModel1
 import com.example.test1.ui.viewModels.ViewModel2
 import com.example.test1.ui.viewModels.ViewModel3
 import com.example.test1.ui.viewModels.ViewModel4
+import com.example.test1.ui.viewModels.ViewModel5
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.koin.compose.viewmodel.koinViewModel
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 data class BottomNavItem(
     val title: String,
@@ -42,6 +51,9 @@ data class BottomNavItem(
 
 @Composable
 fun MainScreen() {
+
+
+
     val items = listOf(
         BottomNavItem(
             title = "Home",
@@ -72,10 +84,27 @@ fun MainScreen() {
             unselectedIcon = Icons.Filled.Person,
             hasNews = true,
         ),
+//        BottomNavItem(
+//            title = "V5",
+//            route = "view5",
+//            selectedIcon = Icons.Filled.Info,
+//            unselectedIcon = Icons.Filled.Info,
+//            hasNews = true,
+//        )
     )
 
-    var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
+    var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
     val navController = rememberNavController()
+    val user = User(name="Dev Jayswal",age = 21,city = "Ahmedabad",address = "Ahmedabad",phone = "+919589883539",
+        email ="Devjayswal404@gmail.com",isStudent = true,grades = listOf(10,20,30,40,50),
+        relatives = listOf(User(name="Shiv Jayswal",age = 23)))
+
+    fun sendToProfile() {
+        val userJson = Json.encodeToString(user)
+        // Encode the JSON string to safely pass it as a URL parameter
+        val encodedUserJson = URLEncoder.encode(userJson, StandardCharsets.UTF_8.toString())
+        navController.navigate("view5/$encodedUserJson")
+    }
 
     Scaffold(
         bottomBar = {
@@ -86,7 +115,7 @@ fun MainScreen() {
                         onClick = {
                             selectedItemIndex = index
                             navController.navigate(item.route) {
-                                popUpTo(navController.graph.findStartDestination().route ?: "view1") {
+                                popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
                                 }
                                 launchSingleTop = true
@@ -96,6 +125,7 @@ fun MainScreen() {
                         label = {
                             Text(text = item.title)
                         },
+                        alwaysShowLabel = false,
                         icon = {
                             BadgedBox(
                                 badge = {
@@ -140,13 +170,15 @@ fun MainScreen() {
             }
             composable("view4") {
                 val viewModel = koinViewModel<ViewModel4>()
-                View4(viewModel)
+                View4(viewModel,  { sendToProfile() } )
             }
-//            composable("view5") {
-//                val viewModel = koinViewModel<ViewModel4>()
-//                View4(viewModel)
-//            }
+            composable("view5/{userJson}") { backStackEntry ->
+                val userJsonEncoded = backStackEntry.arguments?.getString("userJson")
+                val userJson = userJsonEncoded?.let { URLDecoder.decode(it, StandardCharsets.UTF_8.toString()) }
+                val userFromArg = userJson?.let { Json.decodeFromString<User>(it) } ?: user
+                val viewModel = koinViewModel<ViewModel5>()
+                View5(viewModel, userFromArg)
+            }
         }
     }
 }
-

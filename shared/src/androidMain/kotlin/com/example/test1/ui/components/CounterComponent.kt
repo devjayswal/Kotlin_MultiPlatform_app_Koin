@@ -18,13 +18,12 @@ import androidx.compose.ui.unit.dp
 import com.example.test1.ui.viewModels.ViewModel4
 import org.koin.compose.viewmodel.koinViewModel
 
+
 @Composable
-fun CounterComponent(viewModel: ViewModel4 = koinViewModel()) {
+fun CounterComponent(viewModel: ViewModel4 = koinViewModel(), sendToProfile: () -> Unit) {
     val count by viewModel.aNumber
 
-    {
 
-    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -36,13 +35,21 @@ fun CounterComponent(viewModel: ViewModel4 = koinViewModel()) {
             style = MaterialTheme.typography.displayMedium
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Row {
-            Button(onClick = { viewModel.decrement() }) {
-                Text("-")
+        Column{
+            Row{
+                Button(onClick = { viewModel.decrement() }) {
+                    Text("-")
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Button(onClick = { viewModel.increment() }) {
+                    Text("+")
+                }
             }
-            Spacer(modifier = Modifier.width(16.dp))
-            Button(onClick = { viewModel.increment() }) {
-                Text("+")
+            Button(onClick = {
+                // navigation user with userdata
+                sendToProfile()
+            }) {
+                Text("Show the User")
             }
         }
     }

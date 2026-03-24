@@ -5,6 +5,7 @@ import com.example.test1.ui.viewModels.ViewModel1
 import com.example.test1.ui.viewModels.ViewModel2
 import com.example.test1.ui.viewModels.ViewModel3
 import com.example.test1.ui.viewModels.ViewModel4
+import com.example.test1.ui.viewModels.ViewModel5
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -16,5 +17,6 @@ actual fun viewModelModule(): Module {
         viewModelOf(::ViewModel2)
         viewModelOf(::ViewModel3)
         viewModelOf(::ViewModel4)
+        viewModelOf(::ViewModel5)
     }
 }
