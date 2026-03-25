@@ -48,4 +48,11 @@ class ViewModel2 (
             }
         }
     }
+
+    fun clearUsers(){
+        _uiState.update {
+            it.copy(users = emptyList(), isLoading = true)
+        }
+
+    }
 }

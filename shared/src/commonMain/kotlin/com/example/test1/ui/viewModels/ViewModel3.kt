@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.test1.AppResult
 import com.example.test1.model.NewsItem
 import com.example.test1.repository.AppRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,15 +25,21 @@ class ViewModel3 (
     private val _uiState = MutableStateFlow(NewsUiState())
     val uiState: StateFlow<NewsUiState> = _uiState.asStateFlow()
 
+    private var loadJob: Job? = null
+
     init {
         loadData()
     }
 
 
     fun loadData() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+        println("ViewModel3: loadData called")
+        loadJob?.cancel()
+        // Set loading state immediately before launching coroutine
+        _uiState.update { it.copy(isLoading = true, error = null) }
+        println("ViewModel3: Set isLoading=true synchronously")
 
+        loadJob = viewModelScope.launch {
             val newsResult = repository.getNews()
 
 
@@ -48,5 +55,14 @@ class ViewModel3 (
                 newState
             }
         }
+    }
+
+    fun clearNews() {
+        println("ViewModel3: clearNews called")
+        loadJob?.cancel()
+        _uiState.update {
+            it.copy(news = emptyList(), isLoading = true)
+        }
+        println("ViewModel3: State cleared (isLoading=true, news=empty)")
     }
 }

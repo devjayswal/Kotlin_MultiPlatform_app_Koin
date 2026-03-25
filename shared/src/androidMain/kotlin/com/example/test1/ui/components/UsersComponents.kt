@@ -24,11 +24,15 @@ fun UsersComponents() {
     LifecycleEventEffect(Lifecycle.Event.ON_START) { Log.d(TAG, "ON_START") }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { Log.d(TAG, "ON_STOP") }
 
+
     // 2. Refresh on Resume
     LifecycleResumeEffect(viewModel) {
         Log.d(TAG, "ON_RESUME: Refreshing Users")
         viewModel.loadData()
-        onPauseOrDispose { }
+        onPauseOrDispose {
+            Log.d(TAG, "ON_PAUSE or DISPOSE: Clearing Users")
+            viewModel.clearUsers()
+        }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {

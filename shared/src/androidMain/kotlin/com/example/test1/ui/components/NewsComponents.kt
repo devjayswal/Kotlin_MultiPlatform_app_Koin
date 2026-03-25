@@ -19,33 +19,41 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewsComponents() {
-    val viewModel = koinViewModel<ViewModel3>()
+fun NewsComponents(viewModel: ViewModel3 = koinViewModel<ViewModel3>()) {
     val uiState by viewModel.uiState.collectAsState()
     val TAG = "Lifecycle_News"
+    
+    // Local state to mask the first frame with a loading indicator
+    // This prevents seeing old data during the initial composition (Frame 0)
+    var isFirstFrame by remember { mutableStateOf(true) }
 
-    // 1. Log every lifecycle event for testing
-    LifecycleEventEffect(Lifecycle.Event.ON_CREATE) { Log.d(TAG, "ON_CREATE") }
-    LifecycleEventEffect(Lifecycle.Event.ON_START) { Log.d(TAG, "ON_START") }
-    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { Log.d(TAG, "ON_PAUSE") }
-    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { Log.d(TAG, "ON_STOP") }
-//    LifecycleEventEffect(Lifecycle.Event.ON_DESTROY) { Log.d(TAG, "ON_DESTROY") }
+    LaunchedEffect(Unit) {
+        isFirstFrame = false
+    }
 
-    // 2. Refresh data on Resume
-    LifecycleResumeEffect(viewModel) {
-        Log.d(TAG, "ON_RESUME: Refreshing News")
-        viewModel.loadData()
-        onPauseOrDispose {
-            Log.d(TAG, "Leaving Resume state")
+    // 2. Refresh data on Resume and Clear on Dispose
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        Log.d(TAG, "ON_RESUME: Calling loadData")
+        viewModel.loadData() // Ensure we load data when screen becomes active
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            Log.d(TAG, "DisposableEffect: Calling clearNews")
+            viewModel.clearNews() // Clear data when composable is removed from UI tree
         }
     }
+
 
     PullToRefreshBox(
         isRefreshing = uiState.isLoading,
         onRefresh = { viewModel.loadData() },
         modifier = Modifier.fillMaxSize()
     ) {
-        if (uiState.news.isEmpty() && uiState.isLoading) {
+        // Show loading if:
+        // 1. ViewModel says so (uiState.isLoading)
+        // 2. It's the very first frame of composition (masking potential old data)
+        if (uiState.isLoading || isFirstFrame) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }

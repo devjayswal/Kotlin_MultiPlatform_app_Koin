@@ -6,6 +6,5 @@ import com.example.test1.ui.viewModels.ViewModel3
 
 @Composable
 fun View3(viewModel: ViewModel3){
-    NewsComponents()
+    NewsComponents(viewModel)
 }
-

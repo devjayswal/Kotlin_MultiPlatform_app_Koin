@@ -32,8 +32,8 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStart() {
-        connectToWebSocket()
         super.onStart()
+        connectToWebSocket()
         Log.d(TAG, "onStart: Activity is becoming visible")
     }
 
@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
+        disconnectFromWebSocket()
         Log.d(TAG, "onPause: Activity is partially obscured or losing focus")
     }
 
