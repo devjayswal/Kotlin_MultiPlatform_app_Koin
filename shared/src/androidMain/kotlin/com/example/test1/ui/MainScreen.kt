@@ -4,7 +4,6 @@ import android.R.attr.name
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
@@ -18,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -26,6 +24,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.test1.model.User
 import com.example.test1.ui.viewModels.ViewModel1
@@ -95,70 +94,30 @@ fun MainScreen() {
 
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val isFullScreen = currentRoute?.startsWith("view5") == true
     val user = User(name="Dev Jayswal",age = 21,city = "Ahmedabad",address = "Ahmedabad",phone = "+919589883539",
         email ="Devjayswal404@gmail.com",isStudent = true,grades = listOf(10,20,30,40,50),
         relatives = listOf(User(name="Shiv Jayswal",age = 23)))
 
     fun sendToProfile() {
         val userJson = Json.encodeToString(user)
-        // Encode the JSON string to safely pass it as a URL parameter
         val encodedUserJson = URLEncoder.encode(userJson, StandardCharsets.UTF_8.toString())
         navController.navigate("view5/$encodedUserJson")
     }
 
-    Scaffold(
-        bottomBar = {
-            NavigationBar {
-                items.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        selected = selectedItemIndex == index,
-                        onClick = {
-                            selectedItemIndex = index
-                            navController.navigate(item.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        label = {
-                            Text(text = item.title)
-                        },
-                        alwaysShowLabel = false,
-                        icon = {
-                            BadgedBox(
-                                badge = {
-                                    if (item.badgeCount != null) {
-                                        Badge {
-                                            Text(text = item.badgeCount.toString())
-                                        }
-                                    } else if (item.hasNews) {
-                                        Badge()
-                                    }
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = if (index == selectedItemIndex) {
-                                        item.selectedIcon
-                                    } else item.unselectedIcon,
-                                    contentDescription = item.title
-                                )
-                            }
-                        }
-                    )
-                }
-            }
-        }
-    ) { innerPadding ->
+    if (isFullScreen) {
+
+        // 🔥 FULL SCREEN (NO bottom bar)
         NavHost(
             navController = navController,
-            startDestination = "view1",
-            modifier = Modifier.padding(innerPadding)
+            startDestination = "view1"
         ) {
             composable("view1") {
                 val viewModel = koinViewModel<ViewModel1>()
-                View1(viewModel,name)
+                View1(viewModel, name)
             }
             composable("view2") {
                 val viewModel = koinViewModel<ViewModel2>()
@@ -170,14 +129,93 @@ fun MainScreen() {
             }
             composable("view4") {
                 val viewModel = koinViewModel<ViewModel4>()
-                View4(viewModel,  { sendToProfile() } )
+                View4(viewModel, navController)
             }
             composable("view5/{userJson}") { backStackEntry ->
                 val userJsonEncoded = backStackEntry.arguments?.getString("userJson")
-                val userJson = userJsonEncoded?.let { URLDecoder.decode(it, StandardCharsets.UTF_8.toString()) }
-                val userFromArg = userJson?.let { Json.decodeFromString<User>(it) } ?: user
+                val userFromArg = userJsonEncoded?.let {
+                    Json.decodeFromString<User>(it)
+                } ?: user
+
                 val viewModel = koinViewModel<ViewModel5>()
                 View5(viewModel, userFromArg)
+            }
+        }
+
+    } else {
+
+        // 🔥 MAIN APP (WITH bottom bar)
+        Scaffold(
+            bottomBar = {
+                NavigationBar {
+                    items.forEachIndexed { index, item ->
+                        NavigationBarItem(
+                            selected = selectedItemIndex == index,
+                            onClick = {
+                                selectedItemIndex = index
+                                navController.navigate(item.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                            label = { Text(item.title) },
+                            alwaysShowLabel = false,
+                            icon = {
+                                BadgedBox(
+                                    badge = {
+                                        if (item.badgeCount != null) {
+                                            Badge { Text(item.badgeCount.toString()) }
+                                        } else if (item.hasNews) {
+                                            Badge()
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = if (index == selectedItemIndex)
+                                            item.selectedIcon else item.unselectedIcon,
+                                        contentDescription = item.title
+                                    )
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+        ) { innerPadding ->
+
+            NavHost(
+                navController = navController,
+                startDestination = "view1",
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                composable("view1") {
+                    val viewModel = koinViewModel<ViewModel1>()
+                    View1(viewModel, name)
+                }
+                composable("view2") {
+                    val viewModel = koinViewModel<ViewModel2>()
+                    View2(viewModel)
+                }
+                composable("view3") {
+                    val viewModel = koinViewModel<ViewModel3>()
+                    View3(viewModel)
+                }
+                composable("view4") {
+                    val viewModel = koinViewModel<ViewModel4>()
+                    View4(viewModel, navController)
+                }
+                composable("view5/{userJson}") { backStackEntry ->
+                    val userJsonEncoded = backStackEntry.arguments?.getString("userJson")
+                    val userFromArg = userJsonEncoded?.let {
+                        Json.decodeFromString<User>(it)
+                    } ?: user
+
+                    val viewModel = koinViewModel<ViewModel5>()
+                    View5(viewModel, userFromArg)
+                }
             }
         }
     }

@@ -1,60 +1,69 @@
 package com.example.test1.ui.components
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import android.util.Log
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.test1.ui.SharedTestViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.example.test1.ui.viewModels.ViewModel3
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewsComponents(){
+fun NewsComponents() {
     val viewModel = koinViewModel<ViewModel3>()
     val uiState by viewModel.uiState.collectAsState()
+    val TAG = "Lifecycle_News"
 
+    // 1. Log every lifecycle event for testing
+    LifecycleEventEffect(Lifecycle.Event.ON_CREATE) { Log.d(TAG, "ON_CREATE") }
+    LifecycleEventEffect(Lifecycle.Event.ON_START) { Log.d(TAG, "ON_START") }
+    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { Log.d(TAG, "ON_PAUSE") }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { Log.d(TAG, "ON_STOP") }
+//    LifecycleEventEffect(Lifecycle.Event.ON_DESTROY) { Log.d(TAG, "ON_DESTROY") }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        // Data Section
-        if (uiState.isLoading) {
-            CircularProgressIndicator()
-        } else {
-            uiState.error?.let {
-                Text("Error: $it", color = MaterialTheme.colorScheme.error)
+    // 2. Refresh data on Resume
+    LifecycleResumeEffect(viewModel) {
+        Log.d(TAG, "ON_RESUME: Refreshing News")
+        viewModel.loadData()
+        onPauseOrDispose {
+            Log.d(TAG, "Leaving Resume state")
+        }
+    }
+
+    PullToRefreshBox(
+        isRefreshing = uiState.isLoading,
+        onRefresh = { viewModel.loadData() },
+        modifier = Modifier.fillMaxSize()
+    ) {
+        if (uiState.news.isEmpty() && uiState.isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
             }
-
-
+        } else {
             LazyColumn(
-                modifier = Modifier.weight(1f).fillMaxWidth(),
-                contentPadding = PaddingValues(vertical = 8.dp)
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp)
             ) {
-                item { Text("News", style = MaterialTheme.typography.titleMedium) }
+                item { Text("News", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(bottom = 16.dp)) }
+                
                 items(uiState.news) { item ->
                     Card(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth()) {
-                        Column(modifier = Modifier.padding(8.dp)) {
+                        Column(modifier = Modifier.padding(12.dp)) {
                             Text(item.title, fontWeight = FontWeight.Bold)
-                            Text(item.summary ?: "", style = MaterialTheme.typography.bodySmall, maxLines = 2)
+                            item.summary?.let { Text(it, style = MaterialTheme.typography.bodySmall, maxLines = 3) }
                         }
                     }
                 }
-
-                item { Spacer(Modifier.height(16.dp)) }
-
             }
         }
     }

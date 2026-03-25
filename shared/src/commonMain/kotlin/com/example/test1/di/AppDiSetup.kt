@@ -42,3 +42,8 @@ fun resetKoin() {
         koinApplication = null
     }
 }
+
+fun closeConnection() {
+    // Implement connection closing logic here
+    // For example, if you have a database connection or network connection, close it here
+}
