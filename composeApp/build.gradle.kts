@@ -41,6 +41,14 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+        val androidInstrumentedTest by getting {
+            dependencies {
+                implementation(libs.compose.ui.test.junit4)
+                implementation(libs.androidx.testExt.junit)
+                implementation(libs.androidx.espresso.core)
+                implementation(kotlin("test"))
+            }
+        }
     }
 }
 
@@ -54,6 +62,7 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     packaging {
         resources {
@@ -73,4 +82,5 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
+    debugImplementation(libs.compose.ui.test.manifest)
 }

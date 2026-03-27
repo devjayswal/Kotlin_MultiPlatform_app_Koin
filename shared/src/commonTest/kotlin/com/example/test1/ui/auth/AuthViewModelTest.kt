@@ -136,7 +136,7 @@ class AuthViewModelTest {
             val state = awaitItem()
             assertFalse(state.isLoading)
             assertEquals(null, state.error)
-            assertEquals("Login Success", toastService.lastMessage)
+            assertEquals("Logged In", toastService.lastMessage)
             assertEquals(ToastType.SUCCESS, toastService.lastType)
             cancelAndIgnoreRemainingEvents()
         }
