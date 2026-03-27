@@ -5,6 +5,7 @@ import com.example.test1.data.repository.AppRepository
 import com.example.test1.data.local.LocalAssetDataSource
 import com.example.test1.data.local.createLocalAssetDataSource
 import com.example.test1.data.local.TokenManager
+import com.example.test1.data.local.TokenManagerImpl
 import com.example.test1.ui.common.NoOpSoundPlayer
 import com.example.test1.ui.common.SoundPlayer
 import com.example.test1.core.ConnectivityObserver
@@ -23,7 +24,7 @@ expect fun platformModule(): Module
 val commonModule = module {
     single<LocalAssetDataSource> { createLocalAssetDataSource() }
     single<SoundPlayer> { NoOpSoundPlayer }
-    single { TokenManager(get()) }
+    single<TokenManager> { TokenManagerImpl(get()) }
     single { AppRepository(get(), get(), get()) }
 }
 
