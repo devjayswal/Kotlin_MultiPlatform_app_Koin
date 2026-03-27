@@ -1,10 +1,10 @@
 package com.example.test1.di
 
-import com.example.test1.ui.SharedTestViewModel
-import com.example.test1.ui.viewModels.ViewModel1
-import com.example.test1.ui.viewModels.ViewModel2
-import com.example.test1.ui.viewModels.ViewModel3
-import com.example.test1.ui.viewModels.ViewModel4
+import com.example.test1.ui.common.SharedTestViewModel
+import com.example.test1.ui.home.ViewModel1
+import com.example.test1.ui.user.ViewModel2
+import com.example.test1.ui.news.ViewModel3
+import com.example.test1.ui.counter.CounterViewModel
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.module.Module
@@ -16,7 +16,7 @@ actual fun viewModelModule(): Module {
         factory { ViewModel1() }
         factory { ViewModel2() }
         factory { ViewModel3() }
-        factory { ViewModel4() }
+        factory { CounterViewModel() }
     }
 }
 
@@ -25,5 +25,5 @@ class ViewModelProvider : KoinComponent {
     fun provideViewModel1() = get<ViewModel1>()
     fun provideViewModel2() = get<ViewModel2>()
     fun provideViewModel3() = get<ViewModel3>()
-    fun provideViewModel4() = get<ViewModel4>()
+    fun provideViewModel4() = get<CounterViewModel>()
 }

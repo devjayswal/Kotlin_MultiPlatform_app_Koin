@@ -7,17 +7,24 @@ import platform.UIKit.UIAlertAction
 import platform.UIKit.UIAlertActionStyleDefault
 
 class IosToastService : ToastService {
-    override fun showToast(message: String, type: ToastType) {
+    override fun showToast(message: String, type: ToastType, detail: String?) {
         val prefix = when (type) {
-            ToastType.SUCCESS -> "✅ Success"
-            ToastType.FAIL -> "❌ Error"
-            ToastType.INFO -> "ℹ️ Info"
-            ToastType.WARNING -> "⚠️ Warning"
+            ToastType.SUCCESS -> "✅ "
+            ToastType.FAIL -> "❌ "
+            ToastType.INFO -> "ℹ️ "
+            ToastType.WARNING -> "⚠️ "
+        }
+        
+        // Log to console on iOS
+        if (detail != null) {
+            println("[$type] $message | Detail: $detail")
+        } else {
+            println("[$type] $message")
         }
         
         val alert = UIAlertController.alertControllerWithTitle(
-            title = prefix,
-            message = message,
+            title = prefix + message,
+            message = null, // Keep it short as requested
             preferredStyle = UIAlertControllerStyleAlert
         )
         

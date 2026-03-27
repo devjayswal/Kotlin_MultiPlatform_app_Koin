@@ -18,14 +18,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.test1.model.User
-import com.example.test1.ui.viewModels.AuthViewModel
-import com.example.test1.ui.viewModels.ViewModel5
+import com.example.test1.data.model.User
+import com.example.test1.ui.auth.AuthViewModel
+import com.example.test1.ui.user.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun View5(
-    viewModel: ViewModel5,
+    viewModel: ProfileViewModel,
     parsableObject: User,
     authViewModel: AuthViewModel
 ) {

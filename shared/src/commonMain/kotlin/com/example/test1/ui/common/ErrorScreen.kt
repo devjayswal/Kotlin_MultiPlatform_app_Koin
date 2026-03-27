@@ -1,14 +1,17 @@
 package com.example.test1.ui.common
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,11 +32,15 @@ fun ErrorScreen(
             error.message,
             Icons.Default.CloudOff
         )
-        is AppError.Server -> Triple(
-            "Server Error (${error.code})",
-            error.message,
-            Icons.Default.Warning
-        )
+        is AppError.Server -> {
+            val (msg, icon) = when (error) {
+                is AppError.Server.NotFound -> error.msg to Icons.Default.SearchOff
+                is AppError.Server.Unauthorized -> error.msg to Icons.Default.Lock
+                is AppError.Server.PaymentRequired -> error.msg to Icons.Default.Payments
+                else -> error.message to Icons.Default.Warning
+            }
+            Triple("Server Error", msg, icon)
+        }
         is AppError.Unknown -> Triple(
             "Oops!",
             error.message,
@@ -52,21 +59,31 @@ fun ErrorScreen(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(80.dp),
-            tint = MaterialTheme.colors.error
+            tint = MaterialTheme.colorScheme.error
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = title,
-            style = MaterialTheme.typography.h5,
+            style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = message,
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
+        
+        error.code?.let { code ->
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Error Code: $code",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+            )
+        }
+
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = onRetry) {
             Text("Retry")

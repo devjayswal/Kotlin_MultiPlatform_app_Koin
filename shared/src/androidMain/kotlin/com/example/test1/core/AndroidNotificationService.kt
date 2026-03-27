@@ -25,9 +25,10 @@ class AndroidNotificationService(
             val channel = NotificationChannel(
                 channelId,
                 "Timer Notifications",
-                NotificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = "Shows the status of the active timer"
+                setShowBadge(false)
             }
             notificationManager.createNotificationChannel(channel)
         }
@@ -35,11 +36,14 @@ class AndroidNotificationService(
 
     override fun showTimerNotification(title: String, content: String, isOngoing: Boolean) {
         val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(android.R.drawable.ic_dialog_info) // Replace with your app icon
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle(title)
             .setContentText(content)
             .setOngoing(isOngoing)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setOnlyAlertOnce(true)
+            .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .build()
 
         notificationManager.notify(notificationId, notification)

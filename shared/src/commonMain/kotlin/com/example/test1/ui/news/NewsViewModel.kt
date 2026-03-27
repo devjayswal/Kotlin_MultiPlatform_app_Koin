@@ -3,6 +3,7 @@ package com.example.test1.ui.news
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.test1.core.AppResult
+import com.example.test1.core.AppError
 import com.example.test1.data.model.NewsItem
 import com.example.test1.data.repository.AppRepository
 import kotlinx.coroutines.Job
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
 data class NewsUiState(
     val news: List<NewsItem> = emptyList(),
     val isLoading: Boolean = false,
-    val error: String? = null,
+    val error: AppError? = null,
 )
 
 class ViewModel3 (
@@ -33,36 +34,47 @@ class ViewModel3 (
 
 
     fun loadData() {
-        println("ViewModel3: loadData called")
         loadJob?.cancel()
-        // Set loading state immediately before launching coroutine
         _uiState.update { it.copy(isLoading = true, error = null) }
-        println("ViewModel3: Set isLoading=true synchronously")
 
         loadJob = viewModelScope.launch {
             val newsResult = repository.getNews()
 
-
-            _uiState.update { state ->
-                var newState = state.copy(isLoading = false)
-
-                when (newsResult) {
-                    is AppResult.Success -> newState = newState.copy(news = newsResult.data)
-                    is AppResult.Error -> newState = newState.copy(error = newsResult.message)
-                    else -> {}
+            when (newsResult) {
+                is AppResult.Success -> {
+                    _uiState.update { it.copy(isLoading = false, news = newsResult.data) }
                 }
+                is AppResult.Error -> {
+                    if (newsResult.error is AppError.Server.Unauthorized) {
+                        handleUnauthorized()
+                    } else {
+                        _uiState.update { it.copy(isLoading = false, error = newsResult.error) }
+                    }
+                }
+                is AppResult.Loading -> {
+                    _uiState.update { it.copy(isLoading = true) }
+                }
+            }
+        }
+    }
 
-                newState
+    private fun handleUnauthorized() {
+        viewModelScope.launch {
+            val refreshResult = repository.refreshToken()
+            if (refreshResult is AppResult.Success) {
+                loadData()
+            } else {
+                _uiState.update { it.copy(isLoading = false) }
+                // repository.refreshToken() already calls logout() on failure,
+                // and AuthViewModel observes that flow to show Login screen.
             }
         }
     }
 
     fun clearNews() {
-        println("ViewModel3: clearNews called")
         loadJob?.cancel()
         _uiState.update {
-            it.copy(news = emptyList(), isLoading = true)
+            it.copy(news = emptyList(), isLoading = false, error = null)
         }
-        println("ViewModel3: State cleared (isLoading=true, news=empty)")
     }
 }

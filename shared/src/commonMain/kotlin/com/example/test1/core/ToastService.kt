@@ -8,9 +8,15 @@ enum class ToastType {
 }
 
 interface ToastService {
-    fun showToast(message: String, type: ToastType = ToastType.INFO)
-    fun success(message: String) = showToast(message, ToastType.SUCCESS)
-    fun fail(message: String) = showToast(message, ToastType.FAIL)
-    fun info(message: String) = showToast(message, ToastType.INFO)
-    fun warning(message: String) = showToast(message, ToastType.WARNING)
+    /**
+     * Shows a toast on the UI and logs the full message to the console/logcat.
+     * @param message The short message to show on the UI.
+     * @param detail Optional detailed message for logging purposes only.
+     */
+    fun showToast(message: String, type: ToastType = ToastType.INFO, detail: String? = null)
+    
+    fun success(message: String, detail: String? = null) = showToast(message, ToastType.SUCCESS, detail)
+    fun fail(message: String, detail: String? = null) = showToast(message, ToastType.FAIL, detail)
+    fun info(message: String, detail: String? = null) = showToast(message, ToastType.INFO, detail)
+    fun warning(message: String, detail: String? = null) = showToast(message, ToastType.WARNING, detail)
 }

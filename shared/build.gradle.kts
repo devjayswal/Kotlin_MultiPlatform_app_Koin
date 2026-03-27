@@ -34,6 +34,7 @@ kotlin {
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
+            implementation(libs.compose.icons.extended)
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.kmp.observableviewmodel.core)
@@ -43,6 +44,7 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.logging)
+            implementation(libs.androidx.datastore.preferences.core)
 
         }
         commonTest.dependencies {
@@ -51,9 +53,12 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.compose.uiToolingPreview)
+            implementation(libs.compose.uiTooling)
             implementation(libs.ktor.client.okhttp)
             api(libs.androidx.navigation.compose)
             api(libs.koin.compose.viewmodel)
+            implementation(libs.koin.android)
+            implementation(libs.androidx.datastore.preferences)
 
         }
         iosMain.dependencies {

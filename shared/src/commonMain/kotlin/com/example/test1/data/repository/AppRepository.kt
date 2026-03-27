@@ -5,18 +5,27 @@ import com.example.test1.data.model.NetworkUser
 import com.example.test1.data.model.NewsItem
 import com.example.test1.data.model.NewsResponse
 import com.example.test1.core.AppResult
+import com.example.test1.core.AppError
 import com.example.test1.data.local.LocalAssetDataSource
+import com.example.test1.data.local.TokenManager
+import com.example.test1.data.remote.toAppError
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 
 class AppRepository(
     private val apiService: ApiService,
-    private val localAssetDataSource: LocalAssetDataSource
+    private val localAssetDataSource: LocalAssetDataSource,
+    private val tokenManager: TokenManager
 ) {
     private val json = Json { ignoreUnknownKeys = true }
     private companion object {
         const val NEWS_ASSET_PATH = "files/news.json"
         const val USERS_ASSET_PATH = "files/users.json"
     }
+
+    val isUserLoggedInFlow: Flow<Boolean> = tokenManager.accessToken.map { it != null }
 
     suspend fun getNews(limit: Int = 10, offset: Int = 0): AppResult<List<NewsItem>> {
         return try {
@@ -28,7 +37,7 @@ class AppRepository(
                 val cached = json.decodeFromString<NewsResponse>(assetData)
                 AppResult.Success(cached.results)
             } catch (_: Throwable) {
-                AppResult.Error("Failed to load news from API and Assets", networkError)
+                AppResult.Error(networkError.toAppError())
             }
         }
     }
@@ -37,8 +46,8 @@ class AppRepository(
         return try {
             val response = apiService.fetchNewsById(id)
             AppResult.Success(response)
-        } catch (e: Exception) {
-            AppResult.Error("Failed to load news detail: ${e.message}")
+        } catch (e: Throwable) {
+            AppResult.Error(e.toAppError())
         }
     }
 
@@ -51,7 +60,7 @@ class AppRepository(
                 val cached = json.decodeFromString<List<NetworkUser>>(assetData)
                 AppResult.Success(cached)
             } catch (_: Throwable) {
-                AppResult.Error("Failed to load users from API and Assets", networkError)
+                AppResult.Error(networkError.toAppError())
             }
         }
     }
@@ -60,20 +69,42 @@ class AppRepository(
         println("Saving news item: ${newsItem.title}")
     }
 
-    fun login(username: String, password: String): AppResult<Boolean>{
-        println("Logging in with username: $username and password: $password")
-        return TODO("Provide the return value")
+    suspend fun login(username: String, password: String): AppResult<Boolean> {
+        return try {
+            val response = apiService.login(username, password)
+            tokenManager.saveTokens(response.accessToken, response.refreshToken)
+            AppResult.Success(true)
+        } catch (e: Exception) {
+            AppResult.Error(e.toAppError())
+        }
     }
 
-    fun logout(){
-        println("Logging out")
+    suspend fun logout() {
+        tokenManager.clearTokens()
     }
-    fun signup(){
+
+    suspend fun isUserLoggedIn(): Boolean {
+        return tokenManager.accessToken.first() != null
+    }
+
+    fun signup() {
         println("Signing up")
     }
 
-    fun refreshToken(){
-        println("Refreshing token")
+    suspend fun refreshToken(): AppResult<Boolean> {
+        return try {
+            val currentRefreshToken = tokenManager.refreshToken.first()
+            if (currentRefreshToken != null) {
+                val response = apiService.refreshToken(currentRefreshToken)
+                tokenManager.saveTokens(response.accessToken, response.refreshToken)
+                AppResult.Success(true)
+            } else {
+                logout()
+                AppResult.Error(AppError.Server.Unauthorized())
+            }
+        } catch (e: Exception) {
+            logout()
+            AppResult.Error(e.toAppError())
+        }
     }
-
 }
