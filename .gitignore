@@ -68,7 +68,7 @@ google-services.json
 GoogleService-Info.plist
 
 # Node / JS (if applicable)
-node_modules/
+test-server/node_modules
 npm-debug.log
 yarn-error.log
 .eslintcache

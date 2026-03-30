@@ -11,6 +11,7 @@ androidx-lifecycle = "2.8.4"
 androidx-testExt = "1.2.1"
 androidx-datastore = "1.1.1"
 composeMultiplatform = "1.7.1"
+androidx-compose = "1.7.1"
 junit = "4.13.2"
 kotlin = "2.2.0"
 koin = "4.0.0"
@@ -60,7 +61,7 @@ compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "composeMul
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
 compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
 compose-ui-test-junit4 = { module = "org.jetbrains.compose.ui:ui-test-junit4", version.ref = "composeMultiplatform" }
-compose-ui-test-manifest = { module = "org.jetbrains.compose.ui:ui-test-manifest", version.ref = "composeMultiplatform" }
+compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "androidx-compose" }
 
 kmp-observableviewmodel-core = { module = "com.rickclephas.kmp:kmp-observableviewmodel-core", version.ref = "kmpObservableviewmodelCore"}
 

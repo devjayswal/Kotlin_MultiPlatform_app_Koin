@@ -7,7 +7,7 @@ import io.ktor.utils.io.errors.*
 
 fun Throwable.toAppError(): AppError {
     return when (this) {
-        is IOException -> AppError.Network("No internet connection. Please check your network settings.")
+        is IOException -> AppError.Network("Network error: ${this.message ?: "No internet connection"}")
         is ResponseException -> {
             val code = response.status.value
             when (code) {
